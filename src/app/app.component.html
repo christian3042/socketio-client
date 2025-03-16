@@ -1,0 +1,11 @@
+<ul>
+    @for (message of messages; track message) {
+        <div class="container">
+            {{ message.message }}
+        </div>
+    }
+  </ul>
+  
+  <input [formControl]="messageInput" (keyup.enter)="onSendMessage()" />
+  <button mat-raised-button color="primary" (click)="onSendMessage()">Send</button>
+  
