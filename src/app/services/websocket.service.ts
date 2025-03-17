@@ -11,6 +11,9 @@ import { EventToRegister } from "../model/event-to-register";
   providedIn: "root",
 })
 export class WebsocketService {
+
+  sendingTime: Date = new Date();
+
   constructor() {
     this.emitAfterConnect();
     this.connectSocket();
@@ -46,6 +49,7 @@ export class WebsocketService {
   public sendMessage(eventName: string, message: unknown): void {
     if (this.webSocket !== undefined) {
       if (this.isWebsocketConnectedSignal()) {
+        this.sendingTime = new Date();
         this.webSocket.emit(eventName, message);
       } else {
         const eventToSend = {} as EventMsgWrapper;
@@ -106,6 +110,7 @@ export class WebsocketService {
         console.log('Connected: ', this.isWebsocketConnectedSignal());
         this.eventsToSend.forEach((event) => {
           if (this.webSocket !== undefined) {
+            this.sendingTime = new Date();
             this.webSocket.emit(event.eventName, event.message);
           } else {
             console.error("Websocket is undefined!");

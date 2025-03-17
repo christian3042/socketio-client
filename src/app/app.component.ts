@@ -30,6 +30,19 @@ export class AppComponent {
     ngOnInit() {
         this.websocketService.registerEvent(this.eventToRegister);
       this.chatSub = this.chatSubject.subscribe((response: ChatResponse) => {
+        const now: Date = new Date();
+        const ms = now.getTime() - this.websocketService.sendingTime.getTime();
+        console.log('Time (ms) between last send and last receival: ', ms);
+        if (ms < 100) {
+            // TODO: Reset connection
+            this.websocketService.disconnectSocket();
+            this.websocketService.connectSocket();
+            this.messageInput.setValue("TEST");
+            this.onSendMessage();
+            
+        } else {
+            console.error("The application got stuck!!!");
+        }
         this.messages.push(response);
       });
     }
