@@ -109,8 +109,8 @@ export class WebsocketService {
       this.activeSubscriptions.forEach(subscription => {
         subscription.unsubscribe();        
       });
-      this.webSocket.disconnect();
       this.isWebsocketConnectedSignal.update(() => false);
+      this.webSocket.disconnect();
     } else {
       console.error("websocket is undefined!");
     }

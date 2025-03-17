@@ -28,17 +28,20 @@ export class AppComponent {
         const now: Date = new Date();
         const ms = now.getTime() - this.websocketService.sendingTime.getTime();
         console.log('Time (ms) between last send and last receival: ', ms);
-        // if (ms < 100) {
-        //     this.websocketService.disconnectSocket();
-        //     this.websocketService.connectSocket();
-        //     console.log('sending test message');
-        //     this.messageInput.setValue("TEST");
-        //     this.onSendMessage();
+        if (ms < 100) {
+            this.websocketService.disconnectSocket();
+            this.websocketService.connectSocket();
+            console.log('sending test message');
+            this.messageInput.setValue("TEST");
+            this.onSendMessage();
             
-        // } else {
-        //     console.error("The application got stuck!!!");
-        // }
+        } else {
+            console.error("The application got stuck!!!");
+        }
+
         this.messages.push(response);
+        // this.websocketService.disconnectSocket();
+        // this.websocketService.connectSocket();
       });
     }
   
