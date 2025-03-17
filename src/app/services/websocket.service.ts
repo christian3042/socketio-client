@@ -1,11 +1,13 @@
 import { Injectable, WritableSignal, effect, signal } from "@angular/core";
 
-import { Subscription, Observable } from "rxjs";
+import { Subscription, Observable, Subject } from "rxjs";
 
 import { Socket } from "ngx-socket-io";
 
 import { EventMsgWrapper } from "../model/event-msg-wrapper";
 import { EventToRegister } from "../model/event-to-register";
+import { ChatEvents } from "../model/chat-events";
+import { ChatResponse } from "../model/chat-response";
 
 @Injectable({
   providedIn: "root",
@@ -13,6 +15,8 @@ import { EventToRegister } from "../model/event-to-register";
 export class WebsocketService {
 
   sendingTime: Date = new Date();
+  public chatSubject: Subject<ChatResponse> = new Subject<ChatResponse>();
+  private eventToRegister: EventToRegister = new EventToRegister(ChatEvents.MESSAGE_RESPONSE, this.chatSubject);
 
   constructor() {
     this.emitAfterConnect();
@@ -32,9 +36,11 @@ export class WebsocketService {
 
   private eventsToSend: EventMsgWrapper[] = [];
   private eventsToRegister: EventToRegister[] = [];
-  private subscriptionMap = new Map<string, Subscription>();
+  private activeSubscriptions: Subscription[] = [];
 
   public connectSocket() {
+    this.registerEvent(this.eventToRegister);
+    
     this.webSocket = new Socket({
       url: "http://127.0.0.1:8088",
     });
@@ -77,7 +83,7 @@ export class WebsocketService {
       const subscription: Subscription = observable.subscribe((data) => {
         event.getSubject().next(data);
       });
-      this.subscriptionMap.set(event.getEventName(), subscription);
+      this.activeSubscriptions.push(subscription);
     } else {
       console.error("Observable is undefined!");
     }
@@ -99,8 +105,14 @@ export class WebsocketService {
 
   public disconnectSocket() {
     if (this.webSocket !== undefined) {
+      this.unsubscribeEvent(ChatEvents.MESSAGE_RESPONSE);
+      this.activeSubscriptions.forEach(subscription => {
+        subscription.unsubscribe();        
+      });
       this.webSocket.disconnect();
       this.isWebsocketConnectedSignal.update(() => false);
+    } else {
+      console.error("websocket is undefined!");
     }
   }
 
