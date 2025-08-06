@@ -1,3 +1,8 @@
+# Installation
+Make sure you have node js and Angular installed on your machine.
+
+> npm install
+
 # Run
 
 Run the following command:
